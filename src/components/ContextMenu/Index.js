@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import Menu from './Menu'
+import Menu from './menu'
 
 function Context(props) {
   const [menuData, setMenuData] = useState({

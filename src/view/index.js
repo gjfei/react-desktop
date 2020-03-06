@@ -1,7 +1,7 @@
 import React from 'react';
-import StatusBar from '../components/StatusBar/Index'
-import Desktop from '../components/Desktop/Index'
-import ContextMenu from '../components/ContextMenu/Index'
+import StatusBar from '../components/StatusBar'
+import Desktop from '../components/Desktop'
+import ContextMenu from '../components/ContextMenu'
 function Index(){
   return (
     <ContextMenu>

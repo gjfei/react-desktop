@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import store from '../../store'
 import imgURL from '../../assets/book.png';
-import Window from '../windows/Index'
+import Window from '../Windows'
 
 function Desktop() {
   const [statusBarInfo] = useState(store.getState().statusBar)
