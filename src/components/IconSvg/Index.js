@@ -1,24 +1,30 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from 'react'
+import styled from 'styled-components'
+import PropTypes from "prop-types"
 
-function IconSvg (){
+function IconSvg(props) {
+  const { iconName, fill } = props
   return (
-    <i aria-hidden="true" className="anticon">
-      <svg className='icon-class'>
-        <use xlinkHref={"#icon-close"}/>
-      </svg>
-    </i>
+    <Svg className='icon-class' aria-hidden="true">
+      <use xlinkHref={"#icon-" + iconName} fill={fill} />
+    </Svg>
   )
 }
+IconSvg.propTypes = {
+  // svg名字
+  iconName: PropTypes.string.isRequired,
+  // 填充颜色
+  fill: PropTypes.string
+}
 
-const i = styled.i`
-  .icon-class {
-    display: inline-block;
-    overflow: hidden;
-    font-size: 14px;
-    min-width: 14px;
-    width: 1em;
-    height: 1em;
-  }
+IconSvg.defaultProps = {
+  fill: "currentColor"
+}
+const Svg = styled.svg`
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: -0.15em;
+  width: 1em;
+  height: 1em;
 `
 export default IconSvg

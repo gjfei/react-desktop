@@ -1,77 +1,146 @@
-import React, { useState } from 'react'
-import styled from 'styled-components';
-import store from '../../store'
-function DragDropContex(props) {
-  const [statusBarInfo] = useState(store.getState().statusBar)
-  const [position, setPosition] = useState({
-    top: 0,
-    left: 0,
-    zIndex: 1
-  })
-  // 计算拖动位置
-  const handleMouseDown = (e) => {
+import React from 'react'
+import styled from 'styled-components'
+import PropTypes from "prop-types"
+
+function ZoomView(props) {
+  const { position, size, setPosition, setSize, onClick } = props
+  const handleMouseDown = (e, type) => {
+    e.stopPropagation();
     const mousePosition = {
       x: e.clientX,
       y: e.clientY
     }
-    const offset = {
-      top: position.top,
-      left: position.left
-    }
     document.onmousemove = (e) => {
+      let width = size.width
+      let height = size.height
+      let top = position.top
+      let left = position.left
+      switch (type) {
+        case 0:
+          height = size.height - (e.clientY - mousePosition.y)
+          top = position.top + (e.clientY - mousePosition.y)
+          break;
+        case 1:
+          width = size.width + (e.clientX - mousePosition.x)
+          height = size.height - (e.clientY - mousePosition.y)
+          top = position.top + (e.clientY - mousePosition.y)
+          break;
+        case 2:
+          width = size.width + (e.clientX - mousePosition.x)
+          left = position.left + (e.clientY - mousePosition.y)
+          break;
+        case 3:
+          width = size.width + (e.clientX - mousePosition.x)
+          height = size.height + (e.clientY - mousePosition.y)
+          break;
+        case 4:
+          height = size.height + (e.clientY - mousePosition.y)
+          break;
+        case 5:
+          width = size.width - (e.clientX - mousePosition.x)
+          height = size.height + (e.clientY - mousePosition.y)
+          left = position.left + (e.clientX - mousePosition.x)
+          break;
+        case 6:
+          width = size.width - (e.clientX - mousePosition.x)
+          left = position.left + (e.clientX - mousePosition.x)
+          break;
+        case 7:
+          width = size.width - (e.clientX - mousePosition.x)
+          height = size.height - (e.clientY - mousePosition.y)
+          top = position.top + (e.clientY - mousePosition.y)
+          left = position.left + (e.clientX - mousePosition.x)
+          break;
+        default:
+      }
       setPosition({
-        top: e.clientY - (mousePosition.y - offset.top),
-        left: e.clientX - (mousePosition.x - offset.left),
-        zIndex: 1
+        left,
+        top,
+        zIndex: position.zIndex
+      })
+      setSize({
+        width,
+        height,
       })
     }
     // 取消监听
-    document.onmouseup = (e) => {
+    document.onmouseup = () => {
       document.onmouseup = null;
       document.onmousemove = null;
     }
   }
-  const stopPropagation = e => {
-    // 阻止冒泡
-    e.stopPropagation();
+  const handleClick = (e) => {
+    onClick(e)
   }
   return (
-    <View style={{ top: position.top + 'px', left: position.left + 'px' }} onMouseDown={handleMouseDown}>
-      <div className='top box' onMouseDown={stopPropagation}></ div>
-      <div className='right box' onMouseDown={stopPropagation}></div>
-      <div className='bottom box' onMouseDown={stopPropagation}></div>
-      <div className='left box' onMouseDown={stopPropagation}></div>
-      <div className='left top box2' onMouseDown={stopPropagation}></div>
-      <div className='right top box2' onMouseDown={stopPropagation}></div>
-      <div className='left bottom box2' onMouseDown={stopPropagation}></div>
-      <div className='right bottom box2'onMouseDown={stopPropagation}></div>
+    <View style={{ width: size.width + 'px', height: size.height + 'px' }} onClick={handleClick}>
+      <div className='top box' onMouseDown={(e) => { handleMouseDown(e, 0) }}></ div>
+      <div className='right top box2' onMouseDown={(e) => { handleMouseDown(e, 1) }}></div>
+      <div className='right box' onMouseDown={(e) => { handleMouseDown(e, 2) }}></div>
+      <div className='right bottom box2' onMouseDown={(e) => { handleMouseDown(e, 3) }}></div>
+      <div className='bottom box' onMouseDown={(e) => { handleMouseDown(e, 4) }}></div>
+      <div className='left bottom box2' onMouseDown={(e) => { handleMouseDown(e, 5) }}></div>
+      <div className='left box' onMouseDown={(e) => { handleMouseDown(e, 6) }}></div>
+      <div className='left top box2' onMouseDown={(e) => { handleMouseDown(e, 7) }}></div>
       {
         props.children
       }
     </View>
   )
 }
+ZoomView.propTypes = {
+  // 位置
+  position: PropTypes.shape({
+    top: PropTypes.number,
+    left: PropTypes.number,
+    zIndex: PropTypes.number
+  }),
+  // 大小
+  size: PropTypes.shape({
+    width: PropTypes.number,
+    height: PropTypes.number
+  }),
+  // 回调函数
+  setPosition: PropTypes.func,
+  setSize: PropTypes.func,
+  onClick: PropTypes.func
+}
+
+ZoomView.defaultProps = {
+  // 位置
+  position: {
+    top: 0,
+    left: 0,
+    zIndex: 1
+  },
+  // 大小
+  size: {
+    width: 0,
+    height: 0
+  },
+  // 回调函数
+  setPosition: () => { },
+  setSize: () => { },
+  onClick: () => { }
+}
 const View = styled.div`
-  width: 400px;
-  height: 400px;
   background-color:red;
-  position: absolute;
-  padding: 8px;
   box-sizing: border-box;
+  position: relative;
+  overflow: hidden;
   .box {
     position: absolute;
-    background-color: #fff;
     z-index:1;
     &.top {
       width: 100%;
-      height: 8px;
+      height: 4px;
       top: 0;
       left: 0;
       right: 0;
       cursor: n-resize;
     }
     &.right {
-      width: 8px;
+      width: 4px;
       height: 100%;
       top:0;
       right:0;
@@ -79,14 +148,14 @@ const View = styled.div`
     }
     &.bottom {
       width: 100%;
-      height: 8px;
+      height: 4px;
       bottom: 0;
       left: 0;
       right: 0;
       cursor: n-resize;
     }
     &.left {
-      width: 8px;
+      width: 4px;
       height: 100%;
       left: 0;
       top: 0;
@@ -95,9 +164,8 @@ const View = styled.div`
     }
   }
   .box2 {
-    width: 8px;
-    height: 8px;
-    background-color: blue;
+    width: 4px;
+    height: 4px;
     position: absolute;
     z-index: 2;
     &.top {
@@ -122,4 +190,4 @@ const View = styled.div`
     }
   }
 `
-export default DragDropContex
+export default ZoomView

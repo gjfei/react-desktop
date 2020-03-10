@@ -1,13 +1,15 @@
-import React, { useState } from 'react'
-import styled from 'styled-components';
+import React, { useState,useEffect } from 'react'
+import styled from 'styled-components'
+import PropTypes from "prop-types"
 
 function DragDropContex(props) {
-  const [position, setPosition] = useState({
-    top: 0,
-    left: 0,
-  })
+  const [position, setPosition] = useState(props.position)
+  useEffect(()=>{
+    setPosition(props.position)
+  },[props.position])
   // 计算拖动位置
   const handleMouseDown = (e) => {
+    e.stopPropagation()
     const mousePosition = {
       x: e.clientX,
       y: e.clientY
@@ -21,6 +23,11 @@ function DragDropContex(props) {
         top: e.clientY - (mousePosition.y - offset.top),
         left: e.clientX - (mousePosition.x - offset.left),
       })
+      props.setPosition({
+        top: e.clientY - (mousePosition.y - offset.top),
+        left: e.clientX - (mousePosition.x - offset.left),
+        zIndex:position.zIndex
+      }) 
     }
     // 取消监听
     document.onmouseup = (e) => {
@@ -29,16 +36,33 @@ function DragDropContex(props) {
     }
   }
   return (
-    <Context style={{ top: position.top + 'px', left: position.left + 'px' }} onMouseDown={handleMouseDown}>
+    <Context style={{ top: position.top + 'px', left: position.left + 'px' ,zIndex: position.zIndex}} onMouseDown={handleMouseDown}>
       {
         props.children
       }
     </Context>
   )
 }
+DragDropContex.propTypes = {
+  // 位置
+  position: PropTypes.shape({
+    top: PropTypes.number,
+    left: PropTypes.number,
+    zIndex: PropTypes.number
+  }),
+  setPosition: PropTypes.func
+}
+
+DragDropContex.defaultProps = {
+  // 位置
+  position: {
+    top: 0,
+    left: 0,
+    zIndex: 1
+  },
+  setPosition:()=>{}
+}
 const Context = styled.div`
-  width: 100%;
-  height: 100%;
   position: absolute;
 `
 export default DragDropContex

@@ -1,8 +1,13 @@
-import React from 'react';
+import React from 'react'
 import Index from './view/index'
+import { Provider } from 'react-redux'
+import store from './store'
+
 function App() {
   return (
-    <Index></Index>
+    <Provider store={store}>
+      <Index></Index>
+    </Provider>
   )
 }
 
