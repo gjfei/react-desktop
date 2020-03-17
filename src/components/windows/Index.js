@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 import { connect } from 'react-redux';
 import DragAndDrop from '../DragAndDrop'
 import Title from './title'
 import ZoomView from '../ZoomView'
 
 function Window(props) {
-  const { openViewList, titleIconClick, setViewPosition, setViewSize,setViewZIndex } = props
+  const { openViewList, titleIconClick, setViewPosition, setViewSize, setViewZIndex } = props
   const stopPropagation = (e) => {
     // 阻止冒泡
     e.stopPropagation();
@@ -16,11 +16,10 @@ function Window(props) {
         openViewList.map((item, index) => {
           return (
             <DragAndDrop position={item.layout.newVal.position} setPosition={(e) => { setViewPosition(e, index) }} key={item.id}>
-              <ZoomView onClick={()=>{setViewZIndex(index)}} position={item.layout.newVal.position} size={item.layout.newVal.size} setPosition={(e) => { setViewPosition(e, index) }} setSize={(e) => { setViewSize(e, index) }}>
-                <Title title='计算机' iconClick={(type) => { titleIconClick(type, index) }}>
+              <ZoomView onClick={() => { setViewZIndex(index) }} position={item.layout.newVal.position} size={item.layout.newVal.size} setPosition={(e) => { setViewPosition(e, index) }} setSize={(e) => { setViewSize(e, index) }}>
+                <Title title={item.name} iconClick={(type) => { titleIconClick(type, index) }}>
                 </Title>
                 <div className='container' onMouseDown={stopPropagation}>
-                  {item.layout.newVal.position.zIndex}
                   {
                     props.children
                   }
@@ -56,8 +55,8 @@ const mapDispatchToProps = (dispatch) => {
           reviseIndex: index
         }
       }
-      dispatch(changeViewList)
       dispatch(setViewZIndex)
+      dispatch(changeViewList)
     },
     setViewPosition(e, index) {
       // 移动窗口
@@ -74,8 +73,8 @@ const mapDispatchToProps = (dispatch) => {
           reviseIndex: index
         }
       }
-      dispatch(setViewPosition)
       dispatch(setViewZIndex)
+      dispatch(setViewPosition)
     },
     setViewSize(e, index) {
       // 缩放窗口
@@ -92,10 +91,10 @@ const mapDispatchToProps = (dispatch) => {
           reviseIndex: index
         }
       }
-      dispatch(setViewSize)
       dispatch(setViewZIndex)
+      dispatch(setViewSize)
     },
-    setViewZIndex(index){
+    setViewZIndex(index) {
       const setViewZIndex = {
         type: 'setViewZIndex',
         value: {

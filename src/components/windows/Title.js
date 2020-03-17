@@ -5,15 +5,17 @@ import PropTypes from "prop-types"
 
 function WindowsTitle(props) {
   const [icon, setIcon] = useState('restoreDown')
-  const handleClick = (e,index) => {
-    if(icon==='restoreDown' && index===1){
+  const { title } = props
+  const handleClick = (e, index) => {
+    if (icon === 'restoreDown' && index === 1) {
       setIcon('maximize')
-    }else if(icon==='maximize' && index===1){
+    } else if (icon === 'maximize' && index === 1) {
       setIcon('restoreDown')
     }
     props.iconClick(index)
+    e.stopPropagation();
   }
-  const stopPropagation = (e)=>{
+  const stopPropagation = (e) => {
     // 阻止冒泡
     e.stopPropagation();
   }
@@ -23,16 +25,16 @@ function WindowsTitle(props) {
         props.children
       }
       <div className='text'>
-        {props.title}
+        {title}
       </div>
       <div className='handle' onMouseDown={stopPropagation}>
-        <div className='icon' onClick={(e)=>{handleClick(e,0)}}>
+        <div className='icon' onClick={(e) => { handleClick(e, 0) }}>
           <IconSvg iconName='minimize' fill='#333'></IconSvg>
         </div>
-        <div className='icon' onClick={(e)=>{handleClick(e,1)}}>
+        <div className='icon' onClick={(e) => { handleClick(e, 1) }}>
           <IconSvg iconName={icon} fill='#333' ></IconSvg>
         </div>
-        <div className='icon' onClick={(e)=>{handleClick(e,2)}}>
+        <div className='icon' onClick={(e) => { handleClick(e, 2) }}>
           <IconSvg iconName='close' fill='#333'></IconSvg>
         </div>
       </div>
@@ -44,9 +46,12 @@ WindowsTitle.propTypes = {
   iconClick: PropTypes.func
 }
 WindowsTitle.defaultProps = {
-  iconClick: ()=>{}
+  iconClick: () => { }
 }
 const Title = styled.div`
+  padding-left: 10px;
+  box-sizing: border-box;
+  background-color: #FFF;
   width: 100%;
   height: 31px;
   display: flex;

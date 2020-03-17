@@ -124,7 +124,7 @@ ZoomView.defaultProps = {
   onClick: () => { }
 }
 const View = styled.div`
-  background-color:red;
+  border: 1px solid #333;
   box-sizing: border-box;
   position: relative;
   overflow: hidden;

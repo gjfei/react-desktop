@@ -1,15 +1,61 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
-import store from '../../store'
 import Window from '../Windows'
 import DesktopIcon from './desktopIcon'
+import { connect } from 'react-redux';
 
-function Desktop() {
-  const [statusBarInfo] = useState(store.getState().statusBar)
-  const [theme] = useState(store.getState().theme)
+import axios from 'axios'
+
+function Desktop(porps) {
+  const { openViewList, statusBarInfo, theme, addViewList, setViewZIndex } = porps
+  const [articleList, setArticleList] = useState([])
+
+  useEffect(() => {
+    axios.get('article/classify').then(res => {
+      res.data.obj.forEach(item => {
+        item.active = false
+      })
+      setArticleList(res.data.obj)
+    })
+  }, [])
+  const iconDoubleClick = (index) => {
+    let flag = false
+    let viewIndex = 0
+    openViewList.forEach((item,idx) => {
+      if (item.id === articleList[index].id) {
+        flag = true
+        viewIndex = idx
+      }
+    })
+    if (flag) {
+      setViewZIndex(viewIndex)
+    } else {
+      addViewList(articleList[index])
+    }
+  }
+  const onClick = (e) => {
+    const newArticleList = JSON.parse(JSON.stringify(articleList))
+    newArticleList.forEach(item => {
+      item.active = false
+    })
+    setArticleList(newArticleList)
+  }
   return (
-    <Desk position={statusBarInfo.position} style={{ backgroundImage: `url(${theme.desktopBg})` }}>
-      <DesktopIcon></DesktopIcon>
+    <Desk
+      onClick={onClick}
+      position={statusBarInfo.position}
+      style={{ backgroundImage: `url(${theme.desktopBg})` }}>
+      {
+        articleList.map((item, index) => {
+          return <DesktopIcon
+            key={item.id}
+            icon={item.iconUrl}
+            name={item.name}
+            active={item.active}
+            onDoubleClick={() => { iconDoubleClick(index) }}
+          />
+        })
+      }
       <Window></Window>
     </Desk>
   )
@@ -28,4 +74,33 @@ const Desk = styled.div`
   flex-wrap: wrap;
   align-content: flex-start;
 `
-export default Desktop
+const mapStateToProps = (state) => {
+  return {
+    openViewList: state.openViewList,
+    statusBarInfo: state.statusBar,
+    theme: state.theme
+  }
+}
+const mapDispatchToProps = (dispatch) => {
+  return {
+    // 打开窗口
+    addViewList(obj) {
+      console.log(obj)
+      const addViewList = {
+        type: 'addViewList',
+        value: obj
+      }
+      dispatch(addViewList)
+    },
+    setViewZIndex(index) {
+      const setViewZIndex = {
+        type: 'setViewZIndex',
+        value: {
+          reviseIndex: index
+        }
+      }
+      dispatch(setViewZIndex)
+    }
+  }
+}
+export default connect(mapStateToProps, mapDispatchToProps)(Desktop)

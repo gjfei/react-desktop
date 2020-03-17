@@ -87,6 +87,8 @@
     ]
   },
   "devDependencies": {
+    "axios": "^0.19.2",
+    "mockjs": "^1.1.0",
     "svg-sprite-loader": "^4.2.1"
   },
   "jest": {
