@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 import Window from '../Windows'
-import DesktopIcon from './desktopIcon'
+import DesktopIcon from './DesktopIcon'
 import { connect } from 'react-redux';
 
 import axios from 'axios'
